@@ -1,0 +1,118 @@
+[
+  {
+    "id": "Q01",
+    "question": "What is the core difference between LoRA and QLoRA?",
+    "type": "answerable",
+    "relevant_sources": [
+      { "file": "lora.pdf", "pages": [] },
+      { "file": "qlora.pdf", "pages": [] }
+    ],
+    "expected_keywords": ["low-rank", "quantiz", "4-bit", "memory"],
+    "reference_answer": "LoRA freezes the pretrained weights and learns low-rank update matrices. QLoRA additionally quantizes the frozen base model to 4-bit (NF4) and backpropagates through it into the LoRA adapters, cutting memory further."
+  },
+  {
+    "id": "Q02",
+    "question": "What quantization data type does QLoRA introduce and why?",
+    "type": "answerable",
+    "relevant_sources": [{ "file": "qlora.pdf", "pages": [] }],
+    "expected_keywords": ["NF4", "NormalFloat", "information-theoretically", "normally distributed"],
+    "reference_answer": "4-bit NormalFloat (NF4), an information-theoretically optimal data type for normally distributed weights."
+  },
+  {
+    "id": "Q03",
+    "question": "How does double quantization reduce the memory footprint in QLoRA?",
+    "type": "answerable",
+    "relevant_sources": [{ "file": "qlora.pdf", "pages": [] }],
+    "expected_keywords": ["double quantization", "quantization constants", "average memory"],
+    "reference_answer": "It quantizes the quantization constants themselves, saving roughly 0.37 bits per parameter on average."
+  },
+  {
+    "id": "Q04",
+    "question": "What rank r values does the LoRA paper find sufficient for adapting attention weight matrices?",
+    "type": "answerable",
+    "relevant_sources": [{ "file": "lora.pdf", "pages": [] }],
+    "expected_keywords": ["rank", "r = 1", "r = 2", "sufficient"],
+    "reference_answer": "Very small ranks — often r=1 or r=2 — are competitive, suggesting the update matrix has a low intrinsic rank."
+  },
+  {
+    "id": "Q05",
+    "question": "Why does LoRA introduce no additional inference latency, unlike adapter layers?",
+    "type": "answerable",
+    "relevant_sources": [
+      { "file": "lora.pdf", "pages": [] },
+      { "file": "adapters_houlsby.pdf", "pages": [] }
+    ],
+    "expected_keywords": ["merge", "inference", "latency", "no additional"],
+    "reference_answer": "The learned low-rank matrices can be merged into the frozen weights at deployment, so the architecture at inference time is identical to the base model. Adapters add sequential layers that cannot be merged away."
+  },
+  {
+    "id": "Q06",
+    "question": "How does prefix-tuning differ from prompt tuning in where the trainable parameters are inserted?",
+    "type": "answerable",
+    "relevant_sources": [
+      { "file": "prefix_tuning.pdf", "pages": [] },
+      { "file": "prompt_tuning_lester.pdf", "pages": [] }
+    ],
+    "expected_keywords": ["prefix", "every layer", "input embedding", "continuous"],
+    "reference_answer": "Prefix-tuning prepends trainable continuous vectors to the keys and values at every transformer layer; prompt tuning only prepends trainable tokens at the input embedding layer."
+  },
+  {
+    "id": "Q07",
+    "question": "What does the prompt tuning paper conclude about the effect of model scale on parameter-efficient methods?",
+    "type": "answerable",
+    "relevant_sources": [{ "file": "prompt_tuning_lester.pdf", "pages": [] }],
+    "expected_keywords": ["scale", "billion", "gap", "closes", "competitive"],
+    "reference_answer": "As model size grows into the billions of parameters, prompt tuning closes the gap with full fine-tuning and becomes competitive."
+  },
+  {
+    "id": "Q08",
+    "question": "What are the IA3 scaling vectors and which activations do they rescale?",
+    "type": "answerable",
+    "relevant_sources": [{ "file": "ia3_t_few.pdf", "pages": [] }],
+    "expected_keywords": ["IA3", "rescal", "keys", "values", "feed-forward"],
+    "reference_answer": "IA3 learns element-wise scaling vectors that rescale the keys and values in attention and the intermediate activations of the feed-forward network."
+  },
+  {
+    "id": "Q09",
+    "question": "What problem with P-Tuning at smaller model scales does P-Tuning v2 address?",
+    "type": "answerable",
+    "relevant_sources": [
+      { "file": "p_tuning_v2.pdf", "pages": [] },
+      { "file": "p_tuning.pdf", "pages": [] }
+    ],
+    "expected_keywords": ["scale", "deep prompt", "every layer", "sequence labeling"],
+    "reference_answer": "P-Tuning underperforms on small-to-medium models and on hard sequence-labeling tasks; P-Tuning v2 applies deep continuous prompts at every layer to fix this."
+  },
+  {
+    "id": "Q10",
+    "question": "In the adapters paper, roughly what fraction of parameters per task is trained compared to full fine-tuning?",
+    "type": "answerable",
+    "relevant_sources": [{ "file": "adapters_houlsby.pdf", "pages": [] }],
+    "expected_keywords": ["3.6%", "few", "per task", "parameters"],
+    "reference_answer": "Only a few percent of parameters per task (around 3.6% in the reported GLUE experiments) while staying within ~0.4% of full fine-tuning performance."
+  },
+  {
+    "id": "Q11",
+    "question": "According to these papers, what is the exact monthly cloud bill for training a LoRA adapter on AWS?",
+    "type": "unanswerable",
+    "relevant_sources": [],
+    "expected_keywords": [],
+    "reference_answer": "NOT ANSWERABLE — the corpus contains no cloud pricing information. The system must abstain."
+  },
+  {
+    "id": "Q12",
+    "question": "Which of these PEFT methods does the EU AI Act specifically regulate?",
+    "type": "unanswerable",
+    "relevant_sources": [],
+    "expected_keywords": [],
+    "reference_answer": "NOT ANSWERABLE — no regulatory content in the corpus. The system must abstain."
+  },
+  {
+    "id": "Q13",
+    "question": "What benchmark scores did GPT-5 achieve after LoRA fine-tuning?",
+    "type": "unanswerable",
+    "relevant_sources": [],
+    "expected_keywords": [],
+    "reference_answer": "NOT ANSWERABLE — the corpus predates any such model. This probes whether the retriever's nearest-neighbour results tempt the model into fabricating."
+  }
+]
