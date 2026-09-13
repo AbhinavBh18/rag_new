@@ -14,9 +14,11 @@ langchain-huggingface>=0.1.2
 sentence-transformers>=3.0.0
 transformers>=4.44.0                  # token-aware chunk splitting
 
-# ── Vector store (Pinecone, replacing ChromaDB) ──────────────────────
-langchain-pinecone>=0.2.0
-pinecone>=5.0.0                       # NOTE: package renamed from pinecone-client
+# ── Vector store (Qdrant, replacing ChromaDB) ────────────────────────
+# Pinecone has no Python 3.14 wheel; qdrant-client is pure Python
+# (py3-none-any) with 3.14 classified, and runs embedded with no server.
+langchain-qdrant>=0.2.0
+qdrant-client>=1.19.0
 
 # ── Sparse retrieval ─────────────────────────────────────────────────
 rank-bm25>=0.2.2

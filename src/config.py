@@ -6,7 +6,7 @@ weights) only require edits in one file.
 
 CHANGED IN THIS REFACTOR
 ------------------------
-* Added Pinecone settings (replaces ChromaDB).
+* Added Qdrant settings (replaces ChromaDB).
 * Added hybrid-retrieval settings (dense k, sparse k, RRF constant, weights).
 * Added conversation-memory settings.
 * Added evaluation settings (judge model, k-cutoffs).
@@ -29,11 +29,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 PAPERS_DIR = PROJECT_ROOT / "data" / "papers"
 PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
 # The chunk store is a plain JSONL file holding every chunk we ever upserted.
-# WHY: Pinecone is a *vector* database — you cannot cheaply stream every
+# WHY: Qdrant is a *vector* database — you can scroll points out of it, but
 # document back out of it, but BM25 needs the full corpus in memory to build
 # its term-frequency statistics. So the chunk store is the shared source of
 # truth for the sparse half of hybrid retrieval. (ChromaDB used to double as
-# this local docstore; Pinecone does not, hence the new file.)
+# this local docstore; a vector DB should not be relied on for it.)
 CHUNK_STORE_PATH = PROCESSED_DIR / "chunks.jsonl"
 
 EVAL_DIR = PROJECT_ROOT / "eval"
@@ -42,7 +42,7 @@ EVAL_RESULTS_DIR = EVAL_DIR / "results"
 # ──────────────────────────────────────────────
 # Gemini API
 # ──────────────────────────────────────────────
-GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "AQ.Ab8RN6LiuIxm0UzNxBuDkpmFwHbUSUvmSAmoy77Uf2X9NH2dig")
+GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "AQ.Ab8RN6JcgLBT-EJu0P8KsKWccYqoDt0oC4Rmj3nIL4cDvCh8gg")
 LLM_MODEL_NAME: str = os.getenv("LLM_MODEL_NAME", "gemini-3.5-flash")
 
 # NOTE: Google deprecated `temperature` / `top_p` / `top_k` on the newest
@@ -77,7 +77,7 @@ CHUNK_OVERLAP: int = 40  # token overlap between consecutive chunks
 # Retrieval
 # ──────────────────────────────────────────────
 TOP_K: int = 5           # final number of chunks handed to the LLM
-DENSE_TOP_K: int = 10    # candidates pulled from Pinecone before fusion
+DENSE_TOP_K: int = 10    # candidates pulled from Qdrant before fusion
 SPARSE_TOP_K: int = 10   # candidates pulled from BM25 before fusion
 
 # Reciprocal Rank Fusion constant. Standard value from the original RRF paper
@@ -94,15 +94,20 @@ HYBRID_SPARSE_WEIGHT: float = 0.4
 RETRIEVAL_MODE: str = os.getenv("RETRIEVAL_MODE", "hybrid")  # hybrid | dense | sparse
 
 # ──────────────────────────────────────────────
-# Pinecone (replaces ChromaDB)
+# Qdrant (replaces ChromaDB; chosen over Pinecone for Python 3.14 support)
 # ──────────────────────────────────────────────
-PINECONE_API_KEY: str = os.getenv("PINECONE_API_KEY", "pcsk_67CBaS_4Kt4gKc4evEUqDmdkbmq8REnVJakJgXcUzykGs2e6sN3aapV22ED76KGq95x4cJ")
-PINECONE_INDEX_NAME: str = os.getenv("PINECONE_INDEX_NAME", "peft-papers")
-PINECONE_CLOUD: str = os.getenv("PINECONE_CLOUD", "aws")
-PINECONE_REGION: str = os.getenv("PINECONE_REGION", "us-east-1")
-# Namespaces let you keep e.g. "dev" and "prod" corpora in one serverless index.
-PINECONE_NAMESPACE: str = os.getenv("PINECONE_NAMESPACE", "default")
-PINECONE_METRIC: str = "cosine"
+# Qdrant runs in two modes and the code supports both:
+#   * EMBEDDED  (QDRANT_URL empty) — qdrant-client writes to a local folder.
+#     No server, no Docker, no API key. This is the default.
+#   * SERVER    (QDRANT_URL set)   — a real Qdrant instance, either
+#     `docker run -p 6333:6333 qdrant/qdrant` or Qdrant Cloud.
+# The only reason to move to server mode is concurrency — see the note in
+# indexing.py about the embedded-mode directory lock.
+QDRANT_URL: str = os.getenv("QDRANT_URL", "")
+QDRANT_API_KEY: str = os.getenv("QDRANT_API_KEY", "")  # Qdrant Cloud only
+QDRANT_PATH = PROJECT_ROOT / "data" / "qdrant_db"      # embedded-mode storage
+QDRANT_COLLECTION_NAME: str = os.getenv("QDRANT_COLLECTION_NAME", "peft_papers")
+QDRANT_DISTANCE: str = "COSINE"
 UPSERT_BATCH_SIZE: int = 100
 
 # ──────────────────────────────────────────────
